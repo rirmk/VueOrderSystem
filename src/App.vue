@@ -15,7 +15,7 @@
     </div>
     <div class="content">
       <!--路由切换后展示区域-->
-      <router-view></router-view>
+      <router-view :seller="seller"></router-view>
     </div>
   </div>
 </template>
