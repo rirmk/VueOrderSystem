@@ -2,12 +2,12 @@
   <div class="cartcontrol">
     <transition name="move">
       <div class="cart-decrease" v-show="food.count>0"
-      @click="decreaseCart" >
+      @click.stop.prevent="decreaseCart" >
         <span class="inner icon-remove_circle_outline"></span>
       </div>
     </transition>
     <div class="cart-count" v-show="food.count>0">{{food.count}}</div>
-    <div class="cart-add icon-add_circle" @click="addCart($event)"></div>
+    <div class="cart-add icon-add_circle" @click.stop.prevent="addCart"></div>
   </div>
 </template>
 
@@ -29,11 +29,8 @@
        } else {
          this.food.count++;
        }
-       // 使用$emit绑定监听add
-       // $emit触发自定义事件，附加参数返回给监听回调
-       // 在 cartcontrol 组件里点击+时,将点击的dom元素,
-       // 通过 $emit 派发给父组件 goods.vue
-       /* this.$emit('add', event.target); */
+
+       this.$emit('add', event.target);
      },
      decreaseCart(event) {
        if (!event._constructed) {

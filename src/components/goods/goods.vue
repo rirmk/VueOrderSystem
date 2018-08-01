@@ -1,4 +1,5 @@
 <template>
+  <div>
     <div class="goods">
       <div class="menu-wrapper" ref="menuWrapper">
         <ul>
@@ -15,7 +16,7 @@
           <li v-for="item in goods" class="food-list food-list-hook" :key="item.name">
             <h1 class="title">{{item.name}}</h1>
             <ul>
-              <li v-for="food in item.foods" class="food-item border-1px" :key="food.name">
+              <li @click="selectFood(food,$event)" v-for="food in item.foods" class="food-item border-1px" :key="food.name">
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon"/>
                 </div>
@@ -30,7 +31,7 @@
                     <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <cartcontrol :food="food"></cartcontrol>
+                    <cartcontrol :food="food" @add="_drop"></cartcontrol>
                   </div>
                 </div>
               </li>
@@ -38,14 +39,17 @@
           </li>
         </ul>
       </div>
-      <shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+      <shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
     </div>
+    <food @add="addFood" :food="selectedFood" ref="food"></food>
+  </div>
 </template>
 
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
   import shopcart from 'components/shopcart/shopcart';
   import cartcontrol from 'components/cartcontrol/cartcontrol';
+  import food from 'components/food/food';
 
   const ERR_OK = 0;
 
@@ -59,7 +63,8 @@
       return {
         goods: [],
         listHeight: [],
-        scrollY: 0
+        scrollY: 0,
+        selectedFood: {}
       };
     },
     computed: {
@@ -100,6 +105,22 @@
       });
     },
     methods: {
+      selectFood(food, event) {
+        if (!event._constructed) {
+          return;
+        }
+        console.log('hit hit hit me');
+        this.selectedFood = food;
+        this.$refs.food.show();
+      },
+      addFood(target) {
+        this._drop(target);
+      },
+      _drop(target) {
+        this.$nextTick(() => {
+          this.$refs.shopcart.drop(target);
+        });
+      },
       _initScroll() {
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {
           click: true
@@ -135,7 +156,8 @@
     },
     components: {
       shopcart,
-      cartcontrol
+      cartcontrol,
+      food
     }
   };
 </script>
