@@ -13,31 +13,39 @@
         <router-link to="/seller">商家</router-link>
       </div>
     </div>
-    <div class="content">
+    <keep-alive>
       <!--路由切换后展示区域-->
       <router-view :seller="seller"></router-view>
-    </div>
+    </keep-alive>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   /* 导入组件 */
+  import { urlParse } from 'common/js/util';
   import header from 'components/header/header.vue';
 
   const ERR_OK = 0;
+  const debug = process.env.NODE_ENV !== 'production';
 
   /* 注册组件 */
   export default {
     data() {
       return {
-        seller: {}
+        seller: {
+          id: (() => {
+            let queryParam = urlParse();
+            return queryParam.id;
+          })()
+        }
       };
     },
     created() {
-      this.$http.get('/api/seller').then((response) => {
+      const url = debug ? '/api/seller' : 'http://ustbhuangyi.com/sell/api/seller';
+      this.$http.get(url + '?id=' + this.seller.id).then((response) => {
         response = response.body;
         if (response.errno === ERR_OK) {
-          this.seller = response.data;
+          this.seller = Object.assign({}, this.seller, response.data);
         }
       });
     },
